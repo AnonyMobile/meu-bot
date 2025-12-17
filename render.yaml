@@ -1,7 +1,7 @@
 services:
   - type: worker
     name: meu-bot
-    runtime: python
+    env: python
     pythonVersion: 3.11.9
     buildCommand: pip install -r requirements.txt
     startCommand: python bot_total_autonomo.py
