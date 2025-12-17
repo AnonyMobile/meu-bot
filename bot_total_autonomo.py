@@ -3,7 +3,7 @@
 """
 BOT TOTAL AUTÔNOMO  -  R$ 120 únicos → PIX toda sexta
 Cria site, produto, vídeos, anúncios, escala sozinho.
-Dependências: pip install requests schedule moviepy edge-tts python-dotenv
+Dependências: pip install -r requirements.txt
 """
 import os
 import json
@@ -19,7 +19,7 @@ import edge_tts
 from base64 import b64encode
 from dotenv import load_dotenv
 
-load_dotenv()  # carrega .env
+load_dotenv()
 
 # ---------- CONFIGS ----------
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -40,18 +40,18 @@ MINHA_CHAVE_PIX= os.getenv("MINHA_CHAVE_PIX")
 
 MEU_PERCENTUAL = 30
 REINVESTE      = 70
-LIMITE_RECARGA = 2000  # máx/day
+LIMITE_RECARGA = 2000
 
 # ---------- UTILS ----------
-def req_openai(prompt, max_t=500):
+def req_openai(prompt, max_t=500){
     url = "https://api.openai.com/v1/completions"
     headers = {"Authorization": f"Bearer {TOKEN_OPENAI}", "Content-Type": "application/json"}
     payload = {"model": "text-davinci-003", "prompt": prompt, "max_tokens": max_t, "temperature": 0.7}
     r = requests.post(url, json=payload, headers=headers)
     return r.json()["choices"][0]["text"].strip() if r.status_code == 200 else ""
+}
 
-def pix_envia(valor, chave):
-    # PIX automático via Mercado Pago (usa saldo interno)
+def pix_envia(valor, chave){
     url = "https://api.mercadopago.com/v1/payments"
     headers = {"Authorization": f"Bearer {TOKEN_MP}", "Content-Type": "application/json"}
     payload = {
@@ -66,10 +66,10 @@ def pix_envia(valor, chave):
         log(f"[PIX] R$ {valor:.2f} enviado para {chave}")
     else:
         log(f"[PIX] Erro: {r.text}")
+}
 
-def recarga_cartao(valor):
+def recarga_cartao(valor){
     if valor > LIMITE_RECARGA: valor = LIMITE_RECARGA
-    # usa saldo interno do MP
     url = "https://api.mercadopago.com/v1/account/recharge"
     headers = {"Authorization": f"Bearer {TOKEN_MP}", "Content-Type": "application/json"}
     payload = {"amount": float(valor), "card_id": CARTAO_MP_ID}
@@ -78,15 +78,17 @@ def recarga_cartao(valor):
         log(f"[Recarga] Cartão +R$ {valor:.2f}")
     else:
         log(f"[Recarga] Erro: {r.text}")
+}
 
-def split_e_recarga(lucro):
+def split_e_recarga(lucro){
     meu = lucro * (MEU_PERCENTUAL/100)
     reinveste = lucro * (REINVESTE/100)
     pix_envia(meu, MINHA_CHAVE_PIX)
     recarga_cartao(reinveste)
+}
 
 # ---------- 1. NICHOS ----------
-def nicho_quente():
+def nicho_quente(){
     try:
         url = "https://trends.google.com/trends/api/explore"
         params = {"hl": "pt-BR", "tz": "-180", "req": json.dumps({"comparisonItem": [{"keyword": "investimentos", "geo": "BR", "time": "today 12-m"}]})}
@@ -98,30 +100,35 @@ def nicho_quente():
     except: nicho = "investimentos"
     log(f"[Nicho] Escolhido: {nicho}")
     return nicho
+}
 
-# ---------- 2. PRODUTO ----------
-def criar_ebook(nicho):
+def criar_ebook(nicho){
     texto = req_openai(f"Escreva e-book de 20 páginas sobre '{nicho}' para iniciantes.")
     with open("ebook.pdf", "w", encoding="utf-8") as f: f.write(texto)
     return "ebook.pdf"
+}
 
 # ---------- 3. VÍDEOS ----------
-async def texto_para_video(texto, output):
+def texto_para_video(texto, output){
     communicate = edge_tts.Communicate(texto, "pt-BR-AntonioNeural")
-    await communicate.save("audio.mp3")
-   img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920).resize(width=1080, method="lanczos")
+    asyncio.run(communicate.save("audio.mp3"))
+    img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920).resize(width=1080, method="lanczos")
     aud = mp.AudioFileClip("audio.mp3")
     final = img.set_audio(aud)
     final.write_videofile(output, fps=24, codec="libx264", audio_codec="aac", logger=None)
+}
 
-def gerar_videos(nicho, qtd=5):
+def gerar_videos(nicho, qtd){
     for i in range(qtd):
-        texto = req_openai(f"Crie aula de 1 min sobre {nicho}, foco dinheiro.")
-        asyncio.run(texto_para_video(texto, f"aula{i}.mp4"))
-    log(f"[Vídeos] {qtd} aulas geradas")
+        texto = req_openai(f"Crie roteiro de 25 segundos sobre {nicho} e dinheiro.")
+        texto_para_video(texto, f"short{nicho}{i}.mp4")
+        upload_tiktok(f"short{nicho}{i}.mp4", f"#{nicho} #renda")
+        upload_youtube(f"short{nicho}{i}.mp4", f"Como ganhar dinheiro com {nicho}")
+    log(f"[Vídeos] {qtd} shorts gerados")
+}
 
 # ---------- 4. SITE / GitHub Pages ----------
-def html_premium(nicho, preco):
+def html_premium(nicho, preco){
     return f"""<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Curso {nicho} - R$ {preco}</title>
@@ -135,21 +142,24 @@ h1{{font-size:3.5rem}} .preco{{font-size:3rem;color:#FFD700;margin:20px}}
 <p>Fale <strong>roseiro</strong> e ganhe 10% de desconto!</p>
 <button class="cta" onclick="window.open('https://pay.hotmart.com/SEU_PRODUTO_ID','_blank')">Comprar Agora</button>
 <footer>© 2025 - Todos direitos reservados</footer></body></html>"""
+}
 
-def criar_repo(repo):
+def criar_repo(repo){
     url = "https://api.github.com/user/repos"
     headers = {"Authorization": f"token {TOKEN_GITHUB}", "Content-Type": "application/json"}
     payload = {"name": repo, "private": False, "auto_init": True}
     r = requests.post(url, json=payload, headers=headers)
     return r.status_code == 201
+}
 
-def commit_html(repo, html):
+def commit_html(repo, html){
     url = f"https://api.github.com/repos/{GITHUB_USER}/{repo}/contents/index.html"
     data = {"message": "bot: landing", "content": b64encode(html.encode()).decode()}
     r = requests.put(url, json=data, headers={"Authorization": f"token {TOKEN_GITHUB}"})
     return r.status_code == 201
+}
 
-def site_premium(nicho, preco):
+def site_premium(nicho, preco){
     repo = f"curso-{nicho.lower().replace(' ','-')}-{random.randint(1,99)}"
     if not criar_repo(repo): return None
     html = html_premium(nicho, preco)
@@ -157,9 +167,10 @@ def site_premium(nicho, preco):
     url = f"https://{GITHUB_USER}.github.io/{repo}/"
     log(f"[Site] {url}")
     return url
+}
 
 # ---------- 5. HOTMART ----------
-def criar_produto(nicho, preco):
+def criar_produto(nicho, preco){
     url = "https://api.hotmart.com/v1/products"
     headers = {"Authorization": f"Bearer {TOKEN_HOTMART}", "Content-Type": "application/json"}
     payload = {"name": f"Curso {nicho} Premium", "price": preco, "currency": "BRL", "approval": "automatic"}
@@ -170,9 +181,10 @@ def criar_produto(nicho, preco):
         return pid
     log(f"[Hotmart] Erro: {r.text}")
     return None
+}
 
 # ---------- 6. ANÚNCIOS ----------
-def criar_campanha(nicho, url):
+def criar_campanha(nicho, url){
     headers = {"Access-Token": TOKEN_TIKTOK, "Content-Type": "application/json"}
     camp = {
         "advertiser_id": AD_ACCOUNT_ID,
@@ -188,32 +200,36 @@ def criar_campanha(nicho, url):
         return camp_id
     log(f"[Ads] Erro: {r.text}")
     return None
+}
 
 # ---------- 7. UPLOADS ----------
-def upload_tiktok(video, title):
+def upload_tiktok(video, title){
     url = "https://open-api.tiktok.com/share/video/upload/"
     files = {"video": open(video, "rb")}
     data = {"access_token": TOKEN_TIKTOK, "title": title}
     r = requests.post(url, files=files, data=data)
     log(f"[TikTok] Upload: {r.json()}")
+}
 
-def upload_youtube(video, title):
+def upload_youtube(video, title){
     url = f"https://www.googleapis.com/upload/youtube/v3/videos?access_token={TOKEN_YOUTUBE}&part=snippet"
     files = {"media": open(video, "rb")}
     payload = {"snippet": {"title": title, "description": "Curso premium - link na bio", "tags": ["renda", "dinheiro"]}}
     r = requests.post(url, data={"snippet": json.dumps(payload)}, files=files)
     log(f"[YouTube] Upload: {r.json()}")
+}
 
-def publicar_videos(nicho):
-    for i in range(5):
-        v = f"short{nicho}{i}.mp4"
+def publicar_videos(nicho, qtd){
+    for i in range(qtd):
         texto = req_openai(f"Crie roteiro de 25 segundos sobre {nicho} e dinheiro.")
-        asyncio.run(texto_para_video(texto, v))
-        upload_tiktok(v, f"#{nicho} #renda")
-        upload_youtube(v, f"Como ganhar dinheiro com {nicho}")
+        texto_para_video(texto, f"short{nicho}{i}.mp4")
+        upload_tiktok(f"short{nicho}{i}.mp4", f"#{nicho} #renda")
+        upload_youtube(f"short{nicho}{i}.mp4", f"Como ganhar dinheiro com {nicho}")
+    log(f"[Vídeos] {qtd} shorts gerados")
+}
 
 # ---------- 8. ESCALA ----------
-def escalar():
+def escalar(){
     nicho = nicho_quente()
     preco = 497
     ebook = criar_ebook(nicho)
@@ -224,11 +240,12 @@ def escalar():
         html = html_premium(nicho, preco).replace("SEU_PRODUTO_ID", str(pid))
         commit_html(f"curso-{nicho.lower().replace(' ','-')}-v2", html)
     camp_id = criar_campanha(nicho, site)
-    publicar_videos(nicho)
+    publicar_videos(nicho, 5)
     # Split fictício (simula lucro)
     lucro_simulado = 300  # 1 venda R$ 497 - comissões -ads
     split_e_recarga(lucro_simulado)
     log("[Escalar] Ciclo finalizado – vendas entrando.")
+}
 
 # ---------- 9. AGENDA ----------
 schedule.every().monday.do(escalar)
