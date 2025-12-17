@@ -208,11 +208,11 @@ def upload_tiktok(video, title):
     files = {"video": open(video, "rb")}
     data = {"access_token": TOKEN_TIKTOK, "title": title}
     r = requests.post(url, files=files, data=data)
-    
+
     if r.headers.get("Content-Type", "").startswith("application/json"):
-    log(f"[TikTok] Upload: {r.json()}")
-else:
-    log(f"[TikTok] Upload HTTP {r.status_code}: {r.text}")
+        log(f"[TikTok] Upload: {r.json()}")
+    else:
+        log(f"[TikTok] Upload HTTP {r.status_code}: {r.text}")
 
 
 def upload_youtube(video, title):
@@ -233,9 +233,9 @@ def upload_youtube(video, title):
     )
 
     if r.headers.get("Content-Type", "").startswith("application/json"):
-        log(f"[YouTube] Upload: {r.json()}")
-    else:
-        log(f"[YouTube] Upload HTTP {r.status_code}: {r.text}")
+    log(f"[YouTube] Upload: {r.json()}")
+else:
+    log(f"[YouTube] Upload HTTP {r.status_code}: {r.text}")
 
 
 def publicar_videos(nicho, qtd):
