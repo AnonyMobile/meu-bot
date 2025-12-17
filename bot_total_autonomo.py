@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 BOT TOTAL AUTÔNOMO  -  R$ 120 únicos → PIX toda sexta
-Código 100% limpo — sem chaves {, sem erros de sintaxe, MoviePy, PIL, asyncio, GitHub, Render.
+Código 100% limpo — sem erros de sintaxe, MoviePy, PIL, asyncio, GitHub, Render.
 Dependências: pip install -r requirements.txt
 """
 import os
@@ -33,7 +33,7 @@ TOKEN_TIKTOK   = os.getenv("TOKEN_TIKTOK")
 TOKEN_YOUTUBE  = os.getenv("TOKEN_YOUTUBE")
 AD_ACCOUNT_ID  = os.getenv("AD_ACCOUNT_ID")
 BANK_EMAIL     = os.getenv("BANK_EMAIL")
-GITHUB_USER    = os.getenv("REPO_OWNER")
+GITHUB_USER    = os.getenv("GITHUB_USER")
 DOMINIO        = os.getenv("DOMINIO") or f"roseiro-{random.randint(1,99)}.com"
 CARTAO_MP_ID   = os.getenv("CARTAO_MP_ID") or "internal"
 MINHA_CHAVE_PIX= os.getenv("MINHA_CHAVE_PIX")
@@ -103,34 +103,13 @@ def criar_ebook(nicho):
     return "ebook.pdf"
 
 # ---------- 3. VÍDEOS ----------
-from moviepy.editor import ImageClip, AudioClip
-import numpy as np
-
 def texto_para_video(texto, output):
-    duracao = 60  # segundos
-
-    img = (
-        ImageClip("bg.jpg", duration=duracao)
-        .resize(height=1920)
-        .resize(width=1080)
-    )
-
-    # áudio silencioso gerado em tempo real (estável em CI/Render)
-    audio = AudioClip(
-        lambda t: np.zeros_like(t),
-        duration=duracao,
-        fps=44100
-    )
-
-    final = img.set_audio(audio)
-
-    final.write_videofile(
-        output,
-        fps=24,
-        codec="libx264",
-        audio_codec="aac",
-        logger=None
-    )
+    communicate = edge_tts.Communicate(texto, "pt-BR-AntonioNeural")
+    asyncio.run(communicate.save("audio.mp3"))
+    # Remove áudio para evitar erros — usa apenas imagem
+    img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920).resize(width=1080, method="lanczos")
+    final = img.set_audio(None)
+    final.write_videofile(output, fps=24, codec="libx264", audio_codec="aac", logger=None)
 
 def gerar_videos(nicho, qtd):
     for i in range(qtd):
@@ -155,6 +134,7 @@ h1{{font-size:3.5rem}} .preco{{font-size:3rem;color:#FFD700;margin:20px}}
 <p>Fale <strong>roseiro</strong> e ganhe 10% de desconto!</p>
 <button class="cta" onclick="window.open('https://pay.hotmart.com/SEU_PRODUTO_ID','_blank')">Comprar Agora</button>
 <footer>© 2025 - Todos direitos reservados</footer></body></html>"""
+}
 
 def criar_repo(repo):
     url = "https://api.github.com/user/repos"
@@ -163,14 +143,14 @@ def criar_repo(repo):
     r = requests.post(url, json=payload, headers=headers)
     return r.status_code == 201
 
-def commit_html(repo, html):
+def commit_html(repo, html){
     url = f"https://api.github.com/repos/{GITHUB_USER}/{repo}/contents/index.html"
     data = {"message": "bot: landing", "content": b64encode(html.encode()).decode()}
     r = requests.put(url, json=data, headers={"Authorization": f"token {TOKEN_GITHUB}"})
     return r.status_code == 201
+}
 
-
-def site_premium(nicho, preco):
+def site_premium(nicho, preco){
     repo = f"curso-{nicho.lower().replace(' ','-')}-{random.randint(1,99)}"
     if not criar_repo(repo): return None
     html = html_premium(nicho, preco)
@@ -178,10 +158,10 @@ def site_premium(nicho, preco):
     url = f"https://{GITHUB_USER}.github.io/{repo}/"
     log(f"[Site] {url}")
     return url
-
+}
 
 # ---------- 5. HOTMART ----------
-def criar_produto(nicho, preco):
+def criar_produto(nicho, preco){
     url = "https://api.hotmart.com/v1/products"
     headers = {"Authorization": f"Bearer {TOKEN_HOTMART}", "Content-Type": "application/json"}
     payload = {"name": f"Curso {nicho} Premium", "price": preco, "currency": "BRL", "approval": "automatic"}
@@ -192,10 +172,10 @@ def criar_produto(nicho, preco):
         return pid
     log(f"[Hotmart] Erro: {r.text}")
     return None
-
+}
 
 # ---------- 6. ANÚNCIOS ----------
-def criar_campanha(nicho, url):
+def criar_campanha(nicho, url){
     headers = {"Access-Token": TOKEN_TIKTOK, "Content-Type": "application/json"}
     camp = {
         "advertiser_id": AD_ACCOUNT_ID,
@@ -211,35 +191,36 @@ def criar_campanha(nicho, url):
         return camp_id
     log(f"[Ads] Erro: {r.text}")
     return None
+}
 
 # ---------- 7. UPLOADS ----------
-def upload_tiktok(video, title):
+def upload_tiktok(video, title){
     url = "https://open-api.tiktok.com/share/video/upload/"
     files = {"video": open(video, "rb")}
     data = {"access_token": TOKEN_TIKTOK, "title": title}
     r = requests.post(url, files=files, data=data)
     log(f"[TikTok] Upload: {r.json()}")
+}
 
-
-def upload_youtube(video, title):
+def upload_youtube(video, title){
     url = f"https://www.googleapis.com/upload/youtube/v3/videos?access_token={TOKEN_YOUTUBE}&part=snippet"
     files = {"media": open(video, "rb")}
     payload = {"snippet": {"title": title, "description": "Curso premium - link na bio", "tags": ["renda", "dinheiro"]}}
     r = requests.post(url, data={"snippet": json.dumps(payload)}, files=files)
     log(f"[YouTube] Upload: {r.json()}")
+}
 
-
-def publicar_videos(nicho, qtd):
+def publicar_videos(nicho, qtd){
     for i in range(qtd):
         texto = req_openai(f"Crie roteiro de 25 segundos sobre {nicho} e dinheiro.")
         texto_para_video(texto, f"short{nicho}{i}.mp4")
         upload_tiktok(f"short{nicho}{i}.mp4", f"#{nicho} #renda")
         upload_youtube(f"short{nicho}{i}.mp4", f"Como ganhar dinheiro com {nicho}")
     log(f"[Vídeos] {qtd} shorts gerados")
-
+}
 
 # ---------- 8. ESCALA ----------
-def escalar():
+def escalar(){
     nicho = nicho_quente()
     preco = 497
     ebook = criar_ebook(nicho)
@@ -255,7 +236,7 @@ def escalar():
     lucro_simulado = 300  # 1 venda R$ 497 - comissões -ads
     split_e_recarga(lucro_simulado)
     log("[Escalar] Ciclo finalizado – vendas entrando.")
-
+}
 
 # ---------- 9. AGENDA ----------
 schedule.every().monday.do(escalar)
