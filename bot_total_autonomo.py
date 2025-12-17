@@ -115,7 +115,7 @@ async def texto_para_video(texto, output):
     final.write_videofile(output, fps=24, codec="libx264", audio_codec="aac", logger=None)
 
 def gerar_videos(nicho, qtd=5):
-    for i in range(qld):
+    for i in range(qtd):
         texto = req_openai(f"Crie aula de 1 min sobre {nicho}, foco dinheiro.")
         asyncio.run(texto_para_video(texto, f"aula{i}.mp4"))
     log(f"[Vídeos] {qtd} aulas geradas")
