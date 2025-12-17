@@ -1,0 +1,35 @@
+name: Bot 24h
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # roda a cada 6 horas
+  workflow_dispatch:  # permite rodar manualmente
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          TOKEN_OPENAI: ${{ secrets.TOKEN_OPENAI }}
+          TOKEN_HOTMART: ${{ secrets.TOKEN_HOTMART }}
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+          TOKEN_TIKTOK: ${{ secrets.TOKEN_TIKTOK }}
+          TOKEN_YOUTUBE: ${{ secrets.TOKEN_YOUTUBE }}
+          AD_ACCOUNT_ID: ${{ secrets.AD_ACCOUNT_ID }}
+          BANK_EMAIL: ${{ secrets.BANK_EMAIL }}
+          GITHUB_USER: ${{ secrets.GITHUB_USER }}
+          CARTAO_MP_ID: ${{ secrets.CARTAO_MP_ID }}
+          MINHA_CHAVE_PIX: ${{ secrets.MINHA_CHAVE_PIX }}
+        run: python bot_total_autonomo.py
