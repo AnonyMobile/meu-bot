@@ -49,9 +49,8 @@ def req_openai(prompt, max_t=500):
     payload = {"model": "text-davinci-003", "prompt": prompt, "max_tokens": max_t, "temperature": 0.7}
     r = requests.post(url, json=payload, headers=headers)
     return r.json()["choices"][0]["text"].strip() if r.status_code == 200 else ""
-}
 
-def pix_envia(valor, chave){
+def pix_envia(valor, chave):
     url = "https://api.mercadopago.com/v1/payments"
     headers = {"Authorization": f"Bearer {TOKEN_MP}", "Content-Type": "application/json"}
     payload = {
@@ -66,9 +65,8 @@ def pix_envia(valor, chave){
         log(f"[PIX] R$ {valor:.2f} enviado para {chave}")
     else:
         log(f"[PIX] Erro: {r.text}")
-}
 
-def recarga_cartao(valor){
+def recarga_cartao(valor):
     if valor > LIMITE_RECARGA: valor = LIMITE_RECARGA
     url = "https://api.mercadopago.com/v1/account/recharge"
     headers = {"Authorization": f"Bearer {TOKEN_MP}", "Content-Type": "application/json"}
@@ -78,7 +76,6 @@ def recarga_cartao(valor){
         log(f"[Recarga] Cartão +R$ {valor:.2f}")
     else:
         log(f"[Recarga] Erro: {r.text}")
-}
 
 def split_e_recarga(lucro){
     meu = lucro * (MEU_PERCENTUAL/100)
