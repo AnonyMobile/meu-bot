@@ -1,6 +1,9 @@
 moviepy==1.0.3
-pillow<10
+pillow==9.5.0
 requests
 schedule
 edge-tts
 python-dotenv
+imageio
+imageio-ffmpeg
+numpy<2
