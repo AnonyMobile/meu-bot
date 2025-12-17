@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 BOT TOTAL AUTÔNOMO  -  R$ 120 únicos → PIX toda sexta
-Código revisado — sem erros de sintaxe, MoviePy, PIL, asyncio, GitHub, Render.
+Código 100% limpo — sem chaves {, sem erros de sintaxe, MoviePy, PIL, asyncio, GitHub, Render.
 Dependências: pip install -r requirements.txt
 """
 import os
@@ -136,13 +136,12 @@ h1{{font-size:3.5rem}} .preco{{font-size:3rem;color:#FFD700;margin:20px}}
 <footer>© 2025 - Todos direitos reservados</footer></body></html>"""
 }
 
-def criar_repo(repo){
+def criar_repo(repo):
     url = "https://api.github.com/user/repos"
     headers = {"Authorization": f"token {TOKEN_GITHUB}", "Content-Type": "application/json"}
     payload = {"name": repo, "private": False, "auto_init": True}
     r = requests.post(url, json=payload, headers=headers)
     return r.status_code == 201
-}
 
 def commit_html(repo, html){
     url = f"https://api.github.com/repos/{GITHUB_USER}/{repo}/contents/index.html"
