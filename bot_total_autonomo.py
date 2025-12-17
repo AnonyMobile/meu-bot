@@ -107,7 +107,7 @@ def texto_para_video(texto, output):
     communicate = edge_tts.Communicate(texto, "pt-BR-AntonioNeural")
     asyncio.run(communicate.save("audio.mp3"))
     # Remove áudio para evitar erros — usa apenas imagem
-    img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920).resize(width=1080, method="lanczos")
+    img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920").resize(width=1080", resample="lanczos")
     final = img.set_audio(None)
     final.write_videofile(output, fps=24, codec="libx264", audio_codec="aac", logger=None)
 
