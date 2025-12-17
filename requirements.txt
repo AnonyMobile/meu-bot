@@ -1,0 +1,5 @@
+requests
+schedule
+moviepy
+edge-tts
+python-dotenv
