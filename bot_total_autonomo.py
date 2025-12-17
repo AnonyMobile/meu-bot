@@ -106,7 +106,7 @@ def criar_ebook(nicho):
 def texto_para_video(texto, output):
     communicate = edge_tts.Communicate(texto, "pt-BR-AntonioNeural")
     asyncio.run(communicate.save("audio.mp3"))
-    img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920).resize(width=1080, method="lanczos", resample="lanczos")
+    img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920").resize(width=1080", method="lanczos", resample="lanczos")
     aud = mp.AudioFileClip("audio.mp3")
     final = img.set_audio(aud)
     final.write_videofile(output, fps=24, codec="libx264", audio_codec="aac", logger=None)
