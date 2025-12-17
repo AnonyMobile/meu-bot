@@ -208,14 +208,35 @@ def upload_tiktok(video, title):
     files = {"video": open(video, "rb")}
     data = {"access_token": TOKEN_TIKTOK, "title": title}
     r = requests.post(url, files=files, data=data)
+    
+    f r.headers.get("Content-Type", "").startswith("application/json"):
     log(f"[TikTok] Upload: {r.json()}")
+else:
+    log(f"[TikTok] Upload HTTP {r.status_code}: {r.text}")
+
 
 def upload_youtube(video, title):
     url = f"https://www.googleapis.com/upload/youtube/v3/videos?access_token={TOKEN_YOUTUBE}&part=snippet"
     files = {"media": open(video, "rb")}
-    payload = {"snippet": {"title": title, "description": "Curso premium - link na bio", "tags": ["renda", "dinheiro"]}}
-    r = requests.post(url, data={"snippet": json.dumps(payload)}, files=files)
-    log(f"[YouTube] Upload: {r.json()}")
+    payload = {
+        "snippet": {
+            "title": title,
+            "description": "Curso premium - link na bio",
+            "tags": ["renda", "dinheiro"]
+        }
+    }
+
+    r = requests.post(
+        url,
+        data={"snippet": json.dumps(payload)},
+        files=files
+    )
+
+    if r.headers.get("Content-Type", "").startswith("application/json"):
+        log(f"[YouTube] Upload: {r.json()}")
+    else:
+        log(f"[YouTube] Upload HTTP {r.status_code}: {r.text}")
+
 
 def publicar_videos(nicho, qtd):
     for i in range(qtd):
