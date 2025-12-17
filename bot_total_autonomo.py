@@ -142,14 +142,14 @@ def criar_repo(repo):
     r = requests.post(url, json=payload, headers=headers)
     return r.status_code == 201
 
-def commit_html(repo, html){
+def commit_html(repo, html):
     url = f"https://api.github.com/repos/{GITHUB_USER}/{repo}/contents/index.html"
     data = {"message": "bot: landing", "content": b64encode(html.encode()).decode()}
     r = requests.put(url, json=data, headers={"Authorization": f"token {TOKEN_GITHUB}"})
     return r.status_code == 201
-}
 
-def site_premium(nicho, preco){
+
+def site_premium(nicho, preco):
     repo = f"curso-{nicho.lower().replace(' ','-')}-{random.randint(1,99)}"
     if not criar_repo(repo): return None
     html = html_premium(nicho, preco)
@@ -157,10 +157,10 @@ def site_premium(nicho, preco){
     url = f"https://{GITHUB_USER}.github.io/{repo}/"
     log(f"[Site] {url}")
     return url
-}
+
 
 # ---------- 5. HOTMART ----------
-def criar_produto(nicho, preco){
+def criar_produto(nicho, preco):
     url = "https://api.hotmart.com/v1/products"
     headers = {"Authorization": f"Bearer {TOKEN_HOTMART}", "Content-Type": "application/json"}
     payload = {"name": f"Curso {nicho} Premium", "price": preco, "currency": "BRL", "approval": "automatic"}
@@ -171,10 +171,10 @@ def criar_produto(nicho, preco){
         return pid
     log(f"[Hotmart] Erro: {r.text}")
     return None
-}
+
 
 # ---------- 6. ANÚNCIOS ----------
-def criar_campanha(nicho, url){
+def criar_campanha(nicho, url):
     headers = {"Access-Token": TOKEN_TIKTOK, "Content-Type": "application/json"}
     camp = {
         "advertiser_id": AD_ACCOUNT_ID,
@@ -190,36 +190,35 @@ def criar_campanha(nicho, url){
         return camp_id
     log(f"[Ads] Erro: {r.text}")
     return None
-}
 
 # ---------- 7. UPLOADS ----------
-def upload_tiktok(video, title){
+def upload_tiktok(video, title):
     url = "https://open-api.tiktok.com/share/video/upload/"
     files = {"video": open(video, "rb")}
     data = {"access_token": TOKEN_TIKTOK, "title": title}
     r = requests.post(url, files=files, data=data)
     log(f"[TikTok] Upload: {r.json()}")
-}
 
-def upload_youtube(video, title){
+
+def upload_youtube(video, title):
     url = f"https://www.googleapis.com/upload/youtube/v3/videos?access_token={TOKEN_YOUTUBE}&part=snippet"
     files = {"media": open(video, "rb")}
     payload = {"snippet": {"title": title, "description": "Curso premium - link na bio", "tags": ["renda", "dinheiro"]}}
     r = requests.post(url, data={"snippet": json.dumps(payload)}, files=files)
     log(f"[YouTube] Upload: {r.json()}")
-}
 
-def publicar_videos(nicho, qtd){
+
+def publicar_videos(nicho, qtd):
     for i in range(qtd):
         texto = req_openai(f"Crie roteiro de 25 segundos sobre {nicho} e dinheiro.")
         texto_para_video(texto, f"short{nicho}{i}.mp4")
         upload_tiktok(f"short{nicho}{i}.mp4", f"#{nicho} #renda")
         upload_youtube(f"short{nicho}{i}.mp4", f"Como ganhar dinheiro com {nicho}")
     log(f"[Vídeos] {qtd} shorts gerados")
-}
+
 
 # ---------- 8. ESCALA ----------
-def escalar(){
+def escalar():
     nicho = nicho_quente()
     preco = 497
     ebook = criar_ebook(nicho)
@@ -235,7 +234,7 @@ def escalar(){
     lucro_simulado = 300  # 1 venda R$ 497 - comissões -ads
     split_e_recarga(lucro_simulado)
     log("[Escalar] Ciclo finalizado – vendas entrando.")
-}
+
 
 # ---------- 9. AGENDA ----------
 schedule.every().monday.do(escalar)
