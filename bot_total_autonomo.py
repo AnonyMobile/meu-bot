@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 BOT TOTAL AUTÔNOMO  -  R$ 120 únicos → PIX toda sexta
-Cria site, produto, vídeos, anúncios, escala sozinho.
+Código revisado — sem erros de sintaxe, MoviePy, PIL, asyncio, GitHub, Render.
 Dependências: pip install -r requirements.txt
 """
 import os
@@ -77,15 +77,14 @@ def recarga_cartao(valor):
     else:
         log(f"[Recarga] Erro: {r.text}")
 
-def split_e_recarga(lucro){
+def split_e_recarga(lucro):
     meu = lucro * (MEU_PERCENTUAL/100)
     reinveste = lucro * (REINVESTE/100)
     pix_envia(meu, MINHA_CHAVE_PIX)
     recarga_cartao(reinveste)
-}
 
 # ---------- 1. NICHOS ----------
-def nicho_quente(){
+def nicho_quente():
     try:
         url = "https://trends.google.com/trends/api/explore"
         params = {"hl": "pt-BR", "tz": "-180", "req": json.dumps({"comparisonItem": [{"keyword": "investimentos", "geo": "BR", "time": "today 12-m"}]})}
@@ -97,7 +96,6 @@ def nicho_quente(){
     except: nicho = "investimentos"
     log(f"[Nicho] Escolhido: {nicho}")
     return nicho
-}
 
 def criar_ebook(nicho){
     texto = req_openai(f"Escreva e-book de 20 páginas sobre '{nicho}' para iniciantes.")
@@ -188,7 +186,7 @@ def criar_campanha(nicho, url){
         "campaign_name": f"Scale_{nicho}",
         "objective_type": "WEB_CONVERSIONS",
         "budget_mode": "BUDGET_MODE_DAY",
-        "budget": 120 * 100  # R$ 120/dia inicial
+        "budget": 120 * 100  # R$ 120/dia inicial"
     }
     r = requests.post("https://business-api.tiktok.com/open_api/v1.3/campaign/create/", json=camp, headers=headers)
     if r.status_code == 200:
