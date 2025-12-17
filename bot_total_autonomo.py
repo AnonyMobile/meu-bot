@@ -103,13 +103,34 @@ def criar_ebook(nicho):
     return "ebook.pdf"
 
 # ---------- 3. VÍDEOS ----------
+from moviepy.editor import ImageClip, AudioClip
+import numpy as np
+
 def texto_para_video(texto, output):
-    communicate = edge_tts.Communicate(texto, "pt-BR-AntonioNeural")
-    asyncio.run(communicate.save("audio.mp3"))
-    img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920).resize(width=1080)
-    aud = mp.AudioFileClip("audio.mp3")
-    final = img.set_audio(aud)
-    final.write_videofile(output, fps=24, codec="libx264", audio_codec="aac", logger=None)
+    duracao = 60  # segundos
+
+    img = (
+        ImageClip("bg.jpg", duration=duracao)
+        .resize(height=1920)
+        .resize(width=1080)
+    )
+
+    # áudio silencioso gerado em tempo real (estável em CI/Render)
+    audio = AudioClip(
+        lambda t: np.zeros_like(t),
+        duration=duracao,
+        fps=44100
+    )
+
+    final = img.set_audio(audio)
+
+    final.write_videofile(
+        output,
+        fps=24,
+        codec="libx264",
+        audio_codec="aac",
+        logger=None
+    )
 
 def gerar_videos(nicho, qtd):
     for i in range(qtd):
