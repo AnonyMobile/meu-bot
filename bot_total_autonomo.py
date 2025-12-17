@@ -97,33 +97,30 @@ def nicho_quente():
     log(f"[Nicho] Escolhido: {nicho}")
     return nicho
 
-def criar_ebook(nicho){
+def criar_ebook(nicho):
     texto = req_openai(f"Escreva e-book de 20 páginas sobre '{nicho}' para iniciantes.")
     with open("ebook.pdf", "w", encoding="utf-8") as f: f.write(texto)
     return "ebook.pdf"
-}
 
 # ---------- 3. VÍDEOS ----------
-def texto_para_video(texto, output){
+def texto_para_video(texto, output):
     communicate = edge_tts.Communicate(texto, "pt-BR-AntonioNeural")
     asyncio.run(communicate.save("audio.mp3"))
     img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920).resize(width=1080, method="lanczos")
     aud = mp.AudioFileClip("audio.mp3")
     final = img.set_audio(aud)
     final.write_videofile(output, fps=24, codec="libx264", audio_codec="aac", logger=None)
-}
 
-def gerar_videos(nicho, qtd){
+def gerar_videos(nicho, qtd):
     for i in range(qtd):
         texto = req_openai(f"Crie roteiro de 25 segundos sobre {nicho} e dinheiro.")
         texto_para_video(texto, f"short{nicho}{i}.mp4")
         upload_tiktok(f"short{nicho}{i}.mp4", f"#{nicho} #renda")
         upload_youtube(f"short{nicho}{i}.mp4", f"Como ganhar dinheiro com {nicho}")
     log(f"[Vídeos] {qtd} shorts gerados")
-}
 
 # ---------- 4. SITE / GitHub Pages ----------
-def html_premium(nicho, preco){
+def html_premium(nicho, preco):
     return f"""<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Curso {nicho} - R$ {preco}</title>
