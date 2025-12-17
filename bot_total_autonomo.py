@@ -209,7 +209,7 @@ def upload_tiktok(video, title):
     data = {"access_token": TOKEN_TIKTOK, "title": title}
     r = requests.post(url, files=files, data=data)
     
-    f r.headers.get("Content-Type", "").startswith("application/json"):
+    if r.headers.get("Content-Type", "").startswith("application/json"):
     log(f"[TikTok] Upload: {r.json()}")
 else:
     log(f"[TikTok] Upload HTTP {r.status_code}: {r.text}")
