@@ -191,15 +191,28 @@ def criar_campanha(nicho, url):
         "campaign_name": f"Scale_{nicho}",
         "objective_type": "WEB_CONVERSIONS",
         "budget_mode": "BUDGET_MODE_DAY",
-        "budget": 120 * 100  # R$ 120/dia inicial"
+        "budget": 120 * 100
     }
-    r = requests.post("https://business-api.tiktok.com/open_api/v1.3/campaign/create/", json=camp, headers=headers)
-    if r.status_code == 200:
+
+    r = requests.post(
+        "https://business-api.tiktok.com/open_api/v1.3/campaign/create/",
+        json=camp,
+        headers=headers
+    )
+
+    # ✅ VALIDAÇÃO ANTES DE ACESSAR CAMPOS
+    if (
+        r.headers.get("Content-Type", "").startswith("application/json")
+        and "data" in r.json()
+        and "campaign_id" in r.json().get("data", {})
+    ):
         camp_id = r.json()["data"]["campaign_id"]
-        log(f"[Ads] Campanha {camp_id} criada")
+        log(f"[Ads] Campanha criada: {camp_id}")
         return camp_id
-    log(f"[Ads] Erro: {r.text}")
-    return None
+    else:
+        log(f"[Ads] Campanha NÃO criada. Resposta: {r.text}")
+        return None
+
 
 
 # ---------- 7. UPLOADS ----------
