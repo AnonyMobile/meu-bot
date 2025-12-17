@@ -15,6 +15,8 @@ import requests
 import schedule
 import random
 import moviepy.editor as mp
+import moviepy.editor as mp
+from moviepy.video.VideoClip import ColorClip
 import edge_tts
 from base64 import b64encode
 from dotenv import load_dotenv
@@ -107,7 +109,7 @@ def texto_para_video(texto, output):
     communicate = edge_tts.Communicate(texto, "pt-BR-AntonioNeural")
     asyncio.run(communicate.save("audio.mp3"))
     # Remove áudio para evitar erros — usa apenas imagem
-    img = mp.ImageClip("bg.jpg", duration=60).resize(height=1920).resize(width=1080, resample="lanczos")
+    img = ColorClip(size=(1080, 1920), color=(15, 15, 15), duration=60)
     final = img.set_audio(None)
     final.write_videofile(output, fps=24, codec="libx264", audio_codec="aac", logger=None)
 
