@@ -43,7 +43,7 @@ REINVESTE      = 70
 LIMITE_RECARGA = 2000
 
 # ---------- UTILS ----------
-def req_openai(prompt, max_t=500){
+def req_openai(prompt, max_t=500):
     url = "https://api.openai.com/v1/completions"
     headers = {"Authorization": f"Bearer {TOKEN_OPENAI}", "Content-Type": "application/json"}
     payload = {"model": "text-davinci-003", "prompt": prompt, "max_tokens": max_t, "temperature": 0.7}
