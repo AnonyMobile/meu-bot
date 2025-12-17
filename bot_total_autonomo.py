@@ -134,7 +134,6 @@ h1{{font-size:3.5rem}} .preco{{font-size:3rem;color:#FFD700;margin:20px}}
 <p>Fale <strong>roseiro</strong> e ganhe 10% de desconto!</p>
 <button class="cta" onclick="window.open('https://pay.hotmart.com/SEU_PRODUTO_ID','_blank')">Comprar Agora</button>
 <footer>© 2025 - Todos direitos reservados</footer></body></html>"""
-}
 
 def criar_repo(repo):
     url = "https://api.github.com/user/repos"
