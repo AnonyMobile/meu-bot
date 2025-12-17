@@ -210,16 +210,14 @@ def upload_tiktok(video, title):
     r = requests.post(url, files=files, data=data)
     log(f"[TikTok] Upload: {r.json()}")
 
-
-def upload_youtube(video, title):
+def upload_youtube(video, title){
     url = f"https://www.googleapis.com/upload/youtube/v3/videos?access_token={TOKEN_YOUTUBE}&part=snippet"
     files = {"media": open(video, "rb")}
     payload = {"snippet": {"title": title, "description": "Curso premium - link na bio", "tags": ["renda", "dinheiro"]}}
     r = requests.post(url, data={"snippet": json.dumps(payload)}, files=files)
     log(f"[YouTube] Upload: {r.json()}")
 
-
-def publicar_videos(nicho, qtd):
+def publicar_videos(nicho, qtd){
     for i in range(qtd):
         texto = req_openai(f"Crie roteiro de 25 segundos sobre {nicho} e dinheiro.")
         texto_para_video(texto, f"short{nicho}{i}.mp4")
