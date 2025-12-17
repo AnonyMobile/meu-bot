@@ -215,6 +215,7 @@ def upload_tiktok(video, title):
         log(f"[TikTok] Upload HTTP {r.status_code}: {r.text}")
 
 
+
 def upload_youtube(video, title):
     url = f"https://www.googleapis.com/upload/youtube/v3/videos?access_token={TOKEN_YOUTUBE}&part=snippet"
     files = {"media": open(video, "rb")}
